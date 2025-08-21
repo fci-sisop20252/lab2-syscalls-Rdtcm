@@ -40,7 +40,7 @@ int main() {
      * TODO 1: Implementar loop de leitura
      * Loop até read() retornar 0 (fim do arquivo)
      */
-    while (bytes_lidos = read(fd, buffer, sizeof(buffer)) > 0) {
+    while ((bytes_lidos = read(fd, buffer, sizeof(buffer))) > 0) {
         total_reads++;
         
         /*
@@ -48,7 +48,9 @@ int main() {
          */
         for (int i = 0; i < bytes_lidos; i++) {
             /* TODO: verificar '\n' e incrementar total_linhas */
-            if (buffer[i] == '\n') total_linhas++;
+            if (buffer[i] == '\n') {
+                total_linhas++;
+            }
         }
         
         /*

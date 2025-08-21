@@ -13,19 +13,22 @@ strace -e write ./ex1b_write
 ### 🔍 Análise
 
 **1. Quantas syscalls write() cada programa gerou?**
-- ex1a_printf: _____ syscalls
-- ex1b_write: _____ syscalls
+- ex1a_printf: 9 syscalls
+- ex1b_write: 7 syscalls
 
 **2. Por que há diferença entre os dois métodos? Consulte o docs/printf_vs_write.md**
 
 ```
-[Sua análise aqui]
+O printf funciona de forma diferente do write.
+Enquanto o write faz uma chamada de sistema direta sempre que é usado, o printf escreve os dados em um buffer interno, que só é enviado ao sistema, via write por baixo dos panos, quando o buffer está cheio ou quando encontra uma quebra de linha (\n), se estiver escrevendo no terminal.
+
+Por isso, embora printf possa reduzir o número de syscalls em alguns casos, ele também pode gerar várias syscalls se for usado repetidamente com quebras de linha, ao contrário de write, que é mais previsível e controlado.
 ```
 
 **3. Qual método é mais previsível? Por quê você acha isso?**
 
 ```
-[Sua análise aqui]
+O metodo write e mais previsivel por que ele faz uma unica chamada de sistema a cada vez que e chamado, diferente do printf que pode variar o numero de syscalls por conta de varios fatores, como o tipo de buffer, presenca de (\n) e etc.
 ```
 
 ---
@@ -33,8 +36,8 @@ strace -e write ./ex1b_write
 ## 2️⃣ Exercício 2 - Leitura de Arquivo
 
 ### 📊 Resultados da execução:
-- File descriptor: _____
-- Bytes lidos: _____
+- File descriptor: 3
+- Bytes lidos: 128
 
 ### 🔧 Comando strace:
 ```bash
@@ -46,19 +49,19 @@ strace -e openat,read,close ./ex2_leitura
 **1. Qual file descriptor foi usado? Por que não começou em 0, 1 ou 2?**
 
 ```
-[Sua análise aqui]
+Foi utilizado o File Descriptor 3, pois os descritores 0, 1 e 2 já estavam ocupados por padrão. Como esses tres sao automaticamente abertos pelo kernel ao iniciar um processo, o sistema atribuiu o próximo descritor livre, que é o 3, ao abrir o arquivo.
 ```
 
 **2. Como você sabe que o arquivo foi lido completamente?**
 
 ```
-[Sua análise aqui]
+Sei que o arquivo foi lido completamente por que o retorno da funcao read foi exatamente o tamanho definido para o meu buffer. Alem disso, nao houve retorno com valores menores que zero que indicaria erro. Portanto ocorreu a leitura corretamente ate aquele ponto do arquivo.
 ```
 
 **3. Por que verificar retorno de cada syscall?**
 
 ```
-[Sua análise aqui]
+E importante verificar o retorno de cada syscall para garantir que a operacao foi realizada com sucesso. As chamdas de sistema podem falhar por varios motivos e verificar o retorno permite tratar erros de forma correta.
 ```
 
 ---

@@ -69,38 +69,38 @@ E importante verificar o retorno de cada syscall para garantir que a operacao fo
 ## 3️⃣ Exercício 3 - Contador com Loop
 
 ### 📋 Resultados (BUFFER_SIZE = 64):
-- Linhas: _____ (esperado: 25)
-- Caracteres: _____
-- Chamadas read(): _____
-- Tempo: _____ segundos
+- Linhas: 25 (esperado: 25)
+- Caracteres: 1300
+- Chamadas read(): 21
+- Tempo: 0.000082 segundos
 
 ### 🧪 Experimentos com buffer:
 
 | Buffer Size | Chamadas read() | Tempo (s) |
 |-------------|-----------------|-----------|
-| 16          |                 |           |
-| 64          |                 |           |
-| 256         |                 |           |
-| 1024        |                 |           |
+| 16          | 82              | 0.000191  |
+| 64          | 21              | 0.000082  |
+| 256         | 6               | 0.000069  |
+| 1024        | 2               | 0.000069  |
 
 ### 🔍 Análise
 
 **1. Como o tamanho do buffer afeta o número de syscalls?**
 
 ```
-[Sua análise aqui]
+Quanto maior o tamanho do buffer, menos syscalls sao feitas. Consequentemente, resulta em menos tarefas para o kernel assumir o controle da CPU e realizar a tarefa (transicao entre modo usuario e modo kernel). Por este motivo, nota-se que o tempo diminui, justamente pelos motivos supracitados.
 ```
 
 **2. Todas as chamadas read() retornaram BUFFER_SIZE bytes? Discorra brevemente sobre**
 
 ```
-[Sua análise aqui]
+Nao,pois a penultima chamada read() pode ser menor que BUFFER_SIZE bytes. Isso por que nao necessriamente o input tera um numero mutiplo de BUFFER_SIZE bytes de tamanho. Em seguida ocorre a ultima chamada read() com 0 bytes indicando EOF.
 ```
 
 **3. Qual é a relação entre syscalls e performance?**
 
 ```
-[Sua análise aqui]
+Quanto menor o numero de syscalls, mais performance temos. Isso ocorre porque transitar de modo usuario para modo kernel muitas vezes aumenta o overhead do programa.
 ```
 
 ---
@@ -108,10 +108,10 @@ E importante verificar o retorno de cada syscall para garantir que a operacao fo
 ## 4️⃣ Exercício 4 - Cópia de Arquivo
 
 ### 📈 Resultados:
-- Bytes copiados: _____
-- Operações: _____
-- Tempo: _____ segundos
-- Throughput: _____ KB/s
+- Bytes copiados: 1364
+- Operações: 6
+- Tempo: 0.000190 segundos
+- Throughput: 5620.39 KB/s
 
 ### ✅ Verificação:
 ```bash
@@ -124,31 +124,31 @@ Resultado: [ ] Idênticos [ ] Diferentes
 **1. Por que devemos verificar que bytes_escritos == bytes_lidos?**
 
 ```
-[Sua análise aqui]
+Precisamos verificar a fim de verificar se foi escrito todos os dados lidos. A funcao write nem sempre escreve todos os dados por alguns motivos como interrupcoes ou limites de buffer. Por isso, a verificaco e importante pois ela garante a integridade dos dados.
 ```
 
 **2. Que flags são essenciais no open() do destino?**
 
 ```
-[Sua análise aqui]
+as flags `O_CREAT` e `O_WRONLY`. Isso porque o arqquivo deve ser criado e deve ter permissao de escrita.
 ```
 
 **3. O número de reads e writes é igual? Por quê?**
 
 ```
-[Sua análise aqui]
+O número de bytes lidos e escritos tende a ser o mesmo, pois cada bloco lido é escrito no destino. No entanto, o número de chamadas read() e write() pode ser diferente, já que write() nem sempre escreve todos os bytes de uma só vez, podendo exigir múltiplas chamadas para completar a escrita de um único bloco lido.
 ```
 
 **4. Como você saberia se o disco ficou cheio?**
 
 ```
-[Sua análise aqui]
+Na chamada do write() se o disco se encontrar cheio ele retorna -1 e o erro ENOSPC que indica justamente que o disco esta cheio.
 ```
 
 **5. O que acontece se esquecer de fechar os arquivos?**
 
 ```
-[Sua análise aqui]
+Caso os arquivos nao sejam devidamente fechados, o numero de file descriptors pode ser excedido ao limite. Alem disso, fechar os arquivos garante que os ddos sejm escritos e libera recursos do sistema.
 ```
 
 ---
@@ -160,19 +160,20 @@ Resultado: [ ] Idênticos [ ] Diferentes
 **1. Como as syscalls demonstram a transição usuário → kernel?**
 
 ```
-[Sua análise aqui]
+As syscalls so chamadas que fazem um programa sair do modo usuario e entrar em modo kernel, para que o sistem operacional possa executar operacoes com privilegio elevado
 ```
 
 **2. Qual é o seu entendimento sobre a importância dos file descriptors?**
 
 ```
-[Sua análise aqui]
+File descriptors são numeros inteiros que representam recursos abertos pelo sistema operacional, como arquivos, sockets ou pipes. Eles permitem que o programa faça operações de leitura, escrita e controle sobre esses recursos de forma eficiente e padronizada, funcionando como “handles” para gerenciar o acesso ao sistema de arquivos e outros dispositivos. Portanto, ele e importante pois permite que SO identifique e gerencie recursos, e eles sao a comunicacao entre programa e kernel pois sem os fds o programa nao teria acesso de escrita ou leitura em arquivos por exemplo.
+
 ```
 
 **3. Discorra sobre a relação entre o tamanho do buffer e performance:**
 
 ```
-[Sua análise aqui]
+O tamanho do buffer é diretamente proporcional a performance do programa. Pois com buffers grande temos menos syscalls (menos trocas entre modo usuario e modo kernel) e menos overhead por consequencia do numero menor de syscalls. No entanto, buffers grandes exigem mais memoria e por isso sao limitados, por isso o interessante é equilibrar performance com uso de recursos.
 ```
 
 ### ⚡ Comparação de Performance
@@ -183,12 +184,12 @@ time ./ex4_copia
 time cp dados/origem.txt dados/destino_cp.txt
 ```
 
-**Qual foi mais rápido?** _____
+**Qual foi mais rápido?** O meu.
 
 **Por que você acha que foi mais rápido?**
 
 ```
-[Sua análise aqui]
+Acredito que pelo fato do meu program ser mais enxuto, diferentemente do cp que possui varias flags e verificcoes. O meu apenas le e escreve dados em arquivos.
 ```
 
 ---

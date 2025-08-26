@@ -117,7 +117,7 @@ Quanto menor o numero de syscalls, mais performance temos. Isso ocorre porque tr
 ```bash
 diff dados/origem.txt dados/destino.txt
 ```
-Resultado: [ ] Idênticos [ ] Diferentes
+Resultado: [ x ] Idênticos [ ] Diferentes
 
 ### 🔍 Análise
 
